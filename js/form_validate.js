@@ -9,7 +9,7 @@ const queryTypeInputs = document.querySelectorAll('input[name="query-type"]');
 const message = document.getElementById('message');
 const consent = document.getElementById('consent');
 
-// Error Messages
+// Error Message spans
 const firstNameError = document.getElementById('first-name-error');
 const lastNameError = document.getElementById('last-name-error');
 const emailError = document.getElementById('email-error');
@@ -17,6 +17,7 @@ const queryTypeError = document.getElementById('query-type-error');
 const messageError = document.getElementById('message-error');
 const consentError = document.getElementById('consent-error');
 
+//they both map index to index.
 const inputs = [firstName, lastName, email, message, consent];
 const errorMessages = [firstNameError, lastNameError, emailError, messageError, consentError];
 
@@ -37,7 +38,7 @@ const clearErrors = () => {
     queryTypeError.classList.remove('visible');
 }
 
-//validates the form, then returns true if the form is valid, false otherwise 
+//validates the form, returns true if the form is valid, false otherwise 
 const validateForm = () => {
 
     // Reset errors
@@ -45,10 +46,18 @@ const validateForm = () => {
 
     let isValid = true;
 
-    // First Name Validation
+    // Limits
+    const MAX_NAME_LENGTH = 30;
+    const MAX_EMAIL_LENGTH = 30;
+    const MAX_MESSAGE_LENGTH = 100;
+
     // First Name Validation
     if (firstName.value.trim() === '') {
         firstNameError.textContent = 'This field is required';
+        showError(firstName, firstNameError);
+        isValid = false;
+    } else if (firstName.value.trim().length > MAX_NAME_LENGTH) {
+        firstNameError.textContent = `Name should be less than ${MAX_NAME_LENGTH} characters`;
         showError(firstName, firstNameError);
         isValid = false;
     } else if (!isValidName(firstName.value.trim())) {
@@ -62,6 +71,10 @@ const validateForm = () => {
         lastNameError.textContent = 'This field is required';
         showError(lastName, lastNameError);
         isValid = false;
+    } else if (lastName.value.trim().length > MAX_NAME_LENGTH) {
+        lastNameError.textContent = `Name should be less than ${MAX_NAME_LENGTH} characters`;
+        showError(lastName, lastNameError);
+        isValid = false;
     } else if (!isValidName(lastName.value.trim())) {
         lastNameError.textContent = 'Name should not contain numbers';
         showError(lastName, lastNameError);
@@ -69,10 +82,15 @@ const validateForm = () => {
     }
 
     // Email Validation
-    if (!isValidEmail(email.value.trim())) {
+    if (email.value.trim().length > MAX_EMAIL_LENGTH) {
+        emailError.textContent = `Email should be less than ${MAX_EMAIL_LENGTH} characters`;
+        showError(email, emailError);
+        isValid = false;
+    } else if (!isValidEmail(email.value.trim())) {
         showError(email, emailError);
         isValid = false;
     }
+
 
     // Query Type Validation
     let queryTypeSelected = false;
@@ -81,8 +99,6 @@ const validateForm = () => {
     });
     if (!queryTypeSelected) {
         queryTypeError.classList.add('visible');
-        // Add aria-invalid to the entire group container or inputs?
-        // Simple approach: Add to inputs
         queryTypeInputs.forEach(input => {
             input.setAttribute('aria-invalid', 'true'); // valid to put on radio
         });
@@ -94,13 +110,12 @@ const validateForm = () => {
     }
 
     // Message Validation
-    // Message Validation
     if (message.value.trim() === '') {
         messageError.textContent = 'This field is required';
         showError(message, messageError);
         isValid = false;
-    } else if (!isSafeMessage(message.value.trim())) {
-        messageError.textContent = 'Message contains invalid characters';
+    } else if (message.value.trim().length > MAX_MESSAGE_LENGTH) {
+        messageError.textContent = `Message should be less than ${MAX_MESSAGE_LENGTH} characters`;
         showError(message, messageError);
         isValid = false;
     }
@@ -116,8 +131,30 @@ const validateForm = () => {
         consent.removeAttribute('aria-describedby');
     }
 
+    // Common Safety Check
+    if (!checkAllInputsSafe()) {
+        isValid = false;
+    }
+
     return isValid;
 
+}
+
+//loop, check for scripts in input.
+function checkAllInputsSafe() {
+    let allSafe = true;
+    inputs.forEach((input, index) => {
+        // Skip checkboxes and radios if included
+        if (input.type === 'checkbox' || input.type === 'radio') return;
+
+        if (!isSafeInput(input.value.trim())) {
+            const errorMsg = errorMessages[index];
+            errorMsg.textContent = 'Input contains invalid characters';
+            showError(input, errorMsg);
+            allSafe = false;
+        }
+    });
+    return allSafe;
 }
 
 function showError(input, errorMsg) {
@@ -140,11 +177,10 @@ function isValidName(name) {
     return re.test(name);
 }
 
-function isSafeMessage(msg) {
-    // Check for common malicious script patterns
+function isSafeInput(input) {
     // <script>, javascript:, etc.
     const re = /<script\b[^>]*>([\s\S]*?)<\/script>|javascript:|on\w+=/i;
-    return !re.test(msg);
+    return !re.test(input);
 }
 
 export { validateForm };

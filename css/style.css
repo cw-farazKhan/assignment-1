@@ -12,7 +12,7 @@
 
 @font-face {
     font-family: 'Karla';
-    src: url('./assets/fonts/Karla-VariableFont_wght.ttf') format('truetype');
+    src: url('../assets/fonts/Karla-VariableFont_wght.ttf') format('truetype');
     font-weight: 400 700;
     font-style: auto;
 }

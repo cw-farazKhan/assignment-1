@@ -1,6 +1,5 @@
-
-
-import { validateForm } from './error.config.js';
+import { validateForm } from './form_validate.js';
+import { prefillForm } from './util.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('contact-form');
@@ -14,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const message = document.getElementById('message');
     const consent = document.getElementById('consent');
 
-
+    //not used
     document.querySelector('body').onclick = function (e) {
         if (e.target != document.getElementsByClassName('container')[0]) {
             // alert('You clicked outside');
@@ -49,22 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     }
 
-    // Prefill form from URL query parameters
-    function prefillForm() {
-        const urlParams = new URLSearchParams(window.location.search);
-
-        if (urlParams.has('firstName')) firstName.value = urlParams.get('firstName');
-        if (urlParams.has('lastName')) lastName.value = urlParams.get('lastName');
-        if (urlParams.has('email')) email.value = urlParams.get('email');
-        if (urlParams.has('message')) message.value = urlParams.get('message');
-
-        if (urlParams.has('queryType')) {
-            const type = urlParams.get('queryType');
-            const radio = document.querySelector(`input[name="query-type"][value="${type}"]`);
-            if (radio) radio.checked = true;
-        }
-
-    }
-
+    //try to prefill if there is any starter link.
+    //usually referral link etc.
     prefillForm();
 });
