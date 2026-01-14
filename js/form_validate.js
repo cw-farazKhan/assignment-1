@@ -182,5 +182,3 @@ function isSafeInput(input) {
     const re = /<script\b[^>]*>([\s\S]*?)<\/script>|javascript:|on\w+=/i;
     return !re.test(input);
 }
-
-export { validateForm };

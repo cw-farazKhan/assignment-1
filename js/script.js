@@ -1,5 +1,3 @@
-import { validateForm } from './form_validate.js';
-import { prefillForm } from './util.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('contact-form');

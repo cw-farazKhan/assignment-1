@@ -15,6 +15,3 @@ function prefillForm() {
 
 }
 
-export {
-    prefillForm
-}
